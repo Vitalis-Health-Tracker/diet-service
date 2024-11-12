@@ -14,7 +14,7 @@ public class FoodDto {
     private int foodProtein;
     private int foodSugar;
     private int foodGrams;
-    private float caloriesConsumed;
+    private float avgCalories; //Calories per 100gram
 
 
 }

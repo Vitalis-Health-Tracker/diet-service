@@ -7,8 +7,9 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Repository
 public interface DietRepository extends ReactiveMongoRepository<DietModel,String> {
-    Mono<DietModel> findByUserIdAndDietDate(String userId, LocalDate dietDate);
+    Mono<DietModel> findByUserIdAndDietDate(String userId, LocalDateTime dietDate);
 }

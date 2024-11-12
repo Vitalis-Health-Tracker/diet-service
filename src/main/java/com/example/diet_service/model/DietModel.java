@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -18,7 +19,7 @@ public class DietModel {
     @Id
     private String dietId;
     private String userId;
-    private LocalDate dietDate;
-
+    private LocalDateTime dietDate;
+    private float totalCaloriesConsumed;
     public List<FoodDto> foodList;
 }

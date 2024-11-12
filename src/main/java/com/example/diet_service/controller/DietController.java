@@ -18,23 +18,12 @@ public class DietController {
         this.dietService = dietService;
     }
 
-    @PostMapping("/{userId}/food")
-    public Mono<DietModel> addDiet(@PathVariable String userId, @RequestParam String foodName) {
-        return dietService.addDiet(userId, foodName);
+    @PostMapping("/{userId}/food/{foodName}")
+    public Mono<Void> addFood(@PathVariable String userId, @PathVariable String foodName) {
+        return dietService.addFood(userId, foodName);
     }
-
-    @GetMapping("/{userId}/calories")
-    public Mono<Float> calculateTotalCalories(@PathVariable String userId) {
-        return dietService.calculateTotalCalories(userId, LocalDate.now());
-    }
-
-    @PutMapping("/{dietId}/food")
-    public Mono<DietModel> updateDiet(@PathVariable String dietId, @RequestBody FoodDto updatedFood) {
-        return dietService.updateDiet(dietId, updatedFood);
-    }
-
-    @DeleteMapping("/{dietId}/food/{foodId}")
-    public Mono<Void> deleteDiet(@PathVariable String dietId, @PathVariable String foodId) {
-        return dietService.deleteDiet(dietId, foodId);
+    @PostMapping("/{userId}/save-diet")
+    public Mono<DietModel> saveDiet(@PathVariable String userId) {
+        return dietService.saveDietAndCalculateCalories(userId);
     }
 }
