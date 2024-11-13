@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/diet")
@@ -18,12 +19,32 @@ public class DietController {
         this.dietService = dietService;
     }
 
-    @PostMapping("/{userId}/food/{foodName}")
+    @PostMapping("/{userId}/add-food/{foodName}")
     public Mono<Void> addFood(@PathVariable String userId, @PathVariable String foodName) {
         return dietService.addFood(userId, foodName);
+    }
+    @PostMapping("/{userId}/add-custom-food")
+    public Mono<Void> addCustomFood(@PathVariable String userId, @RequestBody FoodDto customFood) {
+        return dietService.addCustomFood(userId, customFood);
     }
     @PostMapping("/{userId}/save-diet")
     public Mono<DietModel> saveDiet(@PathVariable String userId) {
         return dietService.saveDietAndCalculateCalories(userId);
+    }
+    @PostMapping("/{userId}/update-diet")
+    public Mono<DietModel> updateDiet(@PathVariable String userId) {
+        return dietService.updateDiet(userId);
+    }
+    @PostMapping("/{userId}/edit-diet/{foodId}")
+    public Mono<DietModel> editDiet(@PathVariable String userId, @PathVariable String foodId, @RequestBody FoodDto updatedFoodDto) {
+        return dietService.editDiet(userId, foodId, updatedFoodDto);
+    }
+    @DeleteMapping("/{userId}/delete-diet/{foodId}")
+    public Mono<Void> deleteDiet(@PathVariable String userId, @PathVariable String foodId) {
+        return dietService.deleteDiet(userId, foodId).then();
+    }
+    @GetMapping("/{userId}/get-diet")
+    public Mono<DietModel> getDiet(@PathVariable String userId) {
+        return dietService.getDietByUserIdAndDate(userId, LocalDateTime.now());
     }
 }
