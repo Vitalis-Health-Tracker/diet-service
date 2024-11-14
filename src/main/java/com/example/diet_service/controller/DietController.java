@@ -3,6 +3,7 @@ package com.example.diet_service.controller;
 import com.example.diet_service.dto.FoodDto;
 import com.example.diet_service.model.DietModel;
 import com.example.diet_service.service.DietService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -46,5 +47,11 @@ public class DietController {
     @GetMapping("/{userId}/get-diet")
     public Mono<DietModel> getDiet(@PathVariable String userId) {
         return dietService.getDietByUserIdAndDate(userId, LocalDateTime.now());
+    }
+    @GetMapping("{userId}/get-diet-week")
+    public Mono<ResponseEntity<DietModel>> getDietWeek(@PathVariable String userId, @RequestParam LocalDateTime startDate, @RequestParam LocalDateTime endDate) {
+        return dietService.getDietPerWeek(userId, startDate, endDate)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> Mono.just(ResponseEntity.badRequest().body(null)));
     }
 }

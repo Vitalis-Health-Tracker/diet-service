@@ -232,6 +232,11 @@ public class DietService {
                 .switchIfEmpty(Mono.error(new RuntimeException("No diet entry found for user on the specified date")));
     }
 
+    public Mono<DietModel> getDietPerWeek(String userId, LocalDateTime startDate, LocalDateTime endDate) {
+        return dietRepository.findByUserIdAndDietDateBetween(userId, startDate, endDate)
+                .switchIfEmpty(Mono.error(new RuntimeException("No diet entry found for user on the specified dates")));
+    }
+
 
 
 
