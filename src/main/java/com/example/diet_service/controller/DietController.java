@@ -10,6 +10,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/diet")
 public class DietController {
