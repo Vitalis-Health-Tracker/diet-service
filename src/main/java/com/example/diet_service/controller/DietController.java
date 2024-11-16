@@ -22,8 +22,8 @@ public class DietController {
     }
 
     @PostMapping("/{userId}/add-food/{foodName}")
-    public Mono<Void> addFood(@PathVariable String userId, @PathVariable String foodName) {
-        return dietService.addFood(userId, foodName);
+    public Mono<Void> addFood(@PathVariable String userId, @PathVariable String foodName, @RequestParam int grams) {
+        return dietService.addFood(userId, foodName,grams);
     }
     @PostMapping("/{userId}/add-custom-food")
     public Mono<Void> addCustomFood(@PathVariable String userId, @RequestBody FoodDto customFood) {
