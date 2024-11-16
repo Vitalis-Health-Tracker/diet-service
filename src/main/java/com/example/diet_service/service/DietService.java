@@ -54,13 +54,21 @@ public class DietService {
                 });
     }
 
-    public Mono<Void> addFood(String userId, String foodName) {
+    public Mono<Void> addFood(String userId, String foodName, int foodWeightInGrams) {
         return fetchFoodDetails(foodName)
                 .doOnSuccess(food -> {
+                    // Calculate the calories based on the food weight (in grams)
+                    float caloriesForGivenWeight = (food.getAvgCalories() * foodWeightInGrams) / 100;
+
+                    // Set the weight in the food object
+                    food.setFoodGrams(foodWeightInGrams);
+
+                    // Set the calculated calories in the food object
+                    food.setAvgCalories(caloriesForGivenWeight);
+
                     // Temporary store in the map by userId
-                    // Display the food details
                     temporaryFoodList.computeIfAbsent(userId, k -> new ArrayList<>()).add(food);
-                    System.out.println("Food Details: " + food);
+                    System.out.println("Food Added: " + food);
                 })
                 .then();
     }
@@ -158,18 +166,20 @@ public class DietService {
 
                     // Update the food details with the new values from updatedFoodDto
                     foodToEdit.setFoodName(updatedFoodDto.getFoodName());
-                    foodToEdit.setFoodGrams(updatedFoodDto.getFoodGrams());
-                    foodToEdit.setAvgCalories(updatedFoodDto.getAvgCalories());
+                    foodToEdit.setFoodGrams(updatedFoodDto.getFoodGrams());  // Update food grams to the new weight
                     foodToEdit.setFoodFat(updatedFoodDto.getFoodFat());
                     foodToEdit.setFoodProtein(updatedFoodDto.getFoodProtein());
                     foodToEdit.setFoodSugar(updatedFoodDto.getFoodSugar());
 
-                    // Recalculate total calories after the update
+                    // Recalculate calories for the updated food
+                    float newCaloriesForGivenWeight = (updatedFoodDto.getAvgCalories() * updatedFoodDto.getFoodGrams()) / 100;
+                    foodToEdit.setAvgCalories(newCaloriesForGivenWeight);
+
+                    // Recalculate total calories for the diet after the update
                     float totalCalories = (float) currentFoodList.stream()
                             .mapToDouble(food -> (food.getAvgCalories() * food.getFoodGrams()) / 100)
                             .sum();
 
-                    // Set the updated food list and total calories
                     existingDiet.setFoodList(currentFoodList);
                     existingDiet.setTotalCaloriesConsumed(totalCalories);
 
@@ -181,6 +191,7 @@ public class DietService {
                 })
                 .switchIfEmpty(Mono.error(new RuntimeException("No diet entry found for user on current date")));
     }
+
 
     public Mono<DietModel> deleteDiet(String userId, String foodId) {
         // Get the current date and time
