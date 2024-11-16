@@ -7,8 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
@@ -50,7 +50,7 @@ public class DietController {
         return dietService.getDietByUserIdAndDate(userId, LocalDateTime.now());
     }
     @GetMapping("{userId}/get-diet-week")
-    public Mono<ResponseEntity<DietModel>> getDietWeek(@PathVariable String userId, @RequestParam LocalDateTime startDate, @RequestParam LocalDateTime endDate) {
+    public Mono<ResponseEntity<List<DietModel>>> getDietWeek(@PathVariable String userId, @RequestParam LocalDateTime startDate, @RequestParam LocalDateTime endDate) {
         return dietService.getDietPerWeek(userId, startDate, endDate)
                 .map(ResponseEntity::ok)
                 .onErrorResume(e -> Mono.just(ResponseEntity.badRequest().body(null)));

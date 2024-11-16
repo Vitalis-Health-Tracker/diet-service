@@ -15,4 +15,5 @@ public interface DietRepository extends ReactiveMongoRepository<DietModel,String
    // Mono<DietModel> findByUserIdAndDietDate(String userId, LocalDateTime dietDate);
 
     Mono<DietModel> findByUserIdAndDietDateBetween(String userId, LocalDateTime todayStart, LocalDateTime todayEnd);
+    Flux<DietModel> findAllByUserIdAndDietDateBetween(String userId, LocalDateTime startDate, LocalDateTime endDate);
 }
