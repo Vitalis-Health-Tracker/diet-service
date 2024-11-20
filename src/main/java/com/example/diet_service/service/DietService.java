@@ -82,25 +82,33 @@ public class DietService {
     }
 
     public Mono<DietModel> saveDietAndCalculateCalories(String userId) {
-        // Get the food list for the user
-        List<FoodDto> foodList = temporaryFoodList.getOrDefault(userId, new ArrayList<>());
+        Mono<Boolean> hasDietToday = dietRepository.findByUserIdAndDietDateBetween(userId, LocalDateTime.now().toLocalDate().atStartOfDay(), LocalDateTime.now()).hasElement();
+        return hasDietToday.flatMap(hasDiet -> {
+            if (hasDiet) {
+                return updateDiet(userId);
+            }
+            else {
+                // Get the food list for the user
+                List<FoodDto> foodList = temporaryFoodList.getOrDefault(userId, new ArrayList<>());
 
-        // Calculate the total calories from the food list in a non-blocking way
-        Mono<Float> totalCaloriesMono = Flux.fromIterable(foodList)
-                .map(food -> (food.getAvgCalories() * food.getFoodGrams()) / 100) // Calculate calories for each food
-                .reduce(0.0f, Float::sum); // Sum the calories for all foods
+                // Calculate the total calories from the food list in a non-blocking way
+                Mono<Float> totalCaloriesMono = Flux.fromIterable(foodList)
+                        .map(food -> (food.getAvgCalories() * food.getFoodGrams()) / 100) // Calculate calories for each food
+                        .reduce(0.0f, Float::sum); // Sum the calories for all foods
 
-        // Create a new DietModel object after the total calories are calculated
-        return totalCaloriesMono.flatMap(totalCalories -> {
-            DietModel dietModel = new DietModel();
-            dietModel.setUserId(userId);
-            dietModel.setDietDate(LocalDateTime.now()); // Set the current date and time
-            dietModel.setFoodList(foodList);
-            dietModel.setTotalCaloriesConsumed(totalCalories); // Set the total calories
+                // Create a new DietModel object after the total calories are calculated
+                return totalCaloriesMono.flatMap(totalCalories -> {
+                    DietModel dietModel = new DietModel();
+                    dietModel.setUserId(userId);
+                    dietModel.setDietDate(LocalDateTime.now()); // Set the current date and time
+                    dietModel.setFoodList(foodList);
+                    dietModel.setTotalCaloriesConsumed(totalCalories); // Set the total calories
 
-            // Save the DietModel with the total calories
-            return dietRepository.save(dietModel)
-                    .doOnSuccess(savedDiet -> temporaryFoodList.remove(userId)); // Clear the temporary list after saving
+                    // Save the DietModel with the total calories
+                    return dietRepository.save(dietModel)
+                            .doOnSuccess(savedDiet -> temporaryFoodList.remove(userId)); // Clear the temporary list after saving
+                });
+            }
         });
     }
     // Update the user's diet for the current date by adding new food and recalculating the total calories
